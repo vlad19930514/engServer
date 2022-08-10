@@ -2,10 +2,18 @@ import { prop } from '@typegoose/typegoose'
 import { Base, TimeStamps } from '@typegoose/typegoose/lib/defaultClasses'
 
 import { ListModel } from 'src/list/list.model'
-
-export interface UserModel extends Base {}
+// @ts-ignore
+//export interface UserModel extends Base {}
 
 export class UserModel extends TimeStamps {
+  @prop()
+  _id?: string
+  @prop()
+  id?: string
+
+  @prop()
+  googleId?: string
+
   @prop({ unique: true })
   email: string
 

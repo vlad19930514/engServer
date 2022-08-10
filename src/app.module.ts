@@ -11,6 +11,8 @@ import { ListModule } from './list/list.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { resolve } from 'path'
 
+import { GoogleAuthStrategy } from './google-auth/services/passport'
+
 @Module({
   imports: [
     ServeStaticModule.forRoot({
@@ -29,6 +31,6 @@ import { resolve } from 'path'
     ListModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, GoogleAuthStrategy],
 })
 export class AppModule {}
