@@ -10,3 +10,9 @@ export class AuthDto {
   @IsString()
   password: string
 }
+export class GoogleAuthDto {
+  @IsEmail()
+  email: string
+
+  _id: string
+}

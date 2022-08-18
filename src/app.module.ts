@@ -11,7 +11,7 @@ import { ListModule } from './list/list.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { resolve } from 'path'
 
-import { GoogleAuthStrategy } from './google-auth/services/passport'
+import { UserModel } from './user/user.model'
 
 @Module({
   imports: [
@@ -25,12 +25,20 @@ import { GoogleAuthStrategy } from './google-auth/services/passport'
       inject: [ConfigService],
       useFactory: getMongoDbConfig,
     }),
+    TypegooseModule.forFeature([
+      {
+        typegooseClass: UserModel,
+        schemaOptions: {
+          collection: 'User',
+        },
+      },
+    ]),
     AuthModule,
     UserModule,
     WordsModule,
     ListModule,
   ],
   controllers: [AppController],
-  providers: [AppService, GoogleAuthStrategy],
+  providers: [AppService],
 })
 export class AppModule {}

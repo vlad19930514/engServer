@@ -5,16 +5,17 @@ import { InjectModel } from 'nestjs-typegoose'
 import { Strategy, VerifyCallback } from 'passport-google-oauth20'
 import { config } from 'dotenv'
 import { UserModel } from '../../user/user.model'
+import { genSalt, hash } from 'bcryptjs'
 config()
 @Injectable()
-export class GoogleAuthStrategy extends PassportStrategy(Strategy) {
+export class GoogleAuthStrategy extends PassportStrategy(Strategy, 'google') {
   constructor(
     @InjectModel(UserModel) private readonly UserModel: ModelType<UserModel>
   ) {
     super({
-      clientID: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_SECRET,
-      callbackURL: 'google/redirect',
+      clientID: process.env.googleClientID,
+      clientSecret: process.env.googleClientSecret,
+      callbackURL: 'http://localhost:5000/api/auth/google/redirect',
       scope: ['email', 'profile'],
     })
   }
@@ -24,20 +25,37 @@ export class GoogleAuthStrategy extends PassportStrategy(Strategy) {
     profile: any,
     done: VerifyCallback
   ): Promise<any> {
-    console.log(profile)
-    console.log(profile._json.name)
-    console.log(profile._json.email)
-    const existingUser = await this.UserModel.findOne({ googleId: profile.id })
+    const salt = await genSalt(10)
 
+    const existingUser = await this.UserModel.findOne({
+      email: profile._json.email,
+    })
     if (existingUser) {
       //we already have a record
       done(null, existingUser) // nothing to do
     } else {
       //we don't have
       new this.UserModel({
-        googleId: profile.id,
+        googleId: await hash(profile.id, salt),
         name: profile._json.name,
         email: profile._json.email,
+        List: [
+          {
+            listName: 'Основной список',
+            words: [],
+            _id: 'mainList',
+          },
+          {
+            listName: 'Повтор раз в неделю',
+            words: [],
+            _id: 'weekList',
+          },
+          {
+            listName: 'Повтор раз в месяц',
+            words: [],
+            _id: 'monthList',
+          },
+        ],
       })
         .save()
         .then((user) => done(null, user))

@@ -5,7 +5,7 @@ import { genSalt, hash, compare } from 'bcryptjs'
 import { InjectModel } from 'nestjs-typegoose'
 import { RefreshTokenDto } from './dto/refreshToken.dto'
 
-import { AuthDto } from './dto/auth.dto'
+import { AuthDto, GoogleAuthDto } from './dto/auth.dto'
 import { UserModel } from '../user/user.model'
 
 @Injectable()
@@ -17,6 +17,16 @@ export class AuthService {
 
   async login({ email, password }: AuthDto) {
     const user = await this.validateUser(email, password)
+
+    const tokens = await this.issueTokenPair(String(user._id))
+
+    return {
+      user: this.returnUserFields(user),
+      ...tokens,
+    }
+  }
+  async googleLogin({ email }: GoogleAuthDto) {
+    const user = await this.validateGoogleUser(email)
 
     const tokens = await this.issueTokenPair(String(user._id))
 
@@ -42,6 +52,7 @@ export class AuthService {
       ...tokens,
     }
   }
+  //Нужно сделать обработку на совпадение email
   async register({ email, password }: AuthDto) {
     const salt = await genSalt(10)
     const newUser = new this.UserModel({
@@ -85,6 +96,16 @@ export class AuthService {
 
     const isValidPassword = await compare(password, user.password)
     if (!isValidPassword) throw new UnauthorizedException('Invalid password')
+
+    return user
+  }
+  async validateGoogleUser(email: string): Promise<UserModel> {
+    const user = await this.findByEmail(email)
+    if (!user) throw new UnauthorizedException('User not found')
+    //еще нужно сделать если уже есть mail
+    /*  const isValidId = googleId == user.googleId
+
+    if (!isValidId) throw new UnauthorizedException('Invalid password') */
 
     return user
   }

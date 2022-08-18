@@ -7,6 +7,7 @@ import { AuthController } from './auth.controller'
 import { AuthService } from './auth.service'
 import { UserModel } from 'src/user/user.model'
 import { JwtModule } from '@nestjs/jwt'
+import { GoogleAuthStrategy } from 'src/google-auth/services/passport'
 
 @Module({
   controllers: [AuthController],
@@ -26,6 +27,6 @@ import { JwtModule } from '@nestjs/jwt'
       useFactory: getJWTConfig,
     }),
   ],
-  providers: [AuthService, JwtStrategy],
+  providers: [AuthService, JwtStrategy, GoogleAuthStrategy],
 })
 export class AuthModule {}
