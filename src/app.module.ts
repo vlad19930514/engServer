@@ -1,4 +1,3 @@
-import { getMongoDbConfig } from './../config/mongo.config'
 import { Module } from '@nestjs/common'
 import { ConfigModule, ConfigService } from '@nestjs/config'
 import { TypegooseModule } from 'nestjs-typegoose'
@@ -10,16 +9,20 @@ import { WordsModule } from './words/words.module'
 import { ListModule } from './list/list.module'
 import { ServeStaticModule } from '@nestjs/serve-static'
 import { resolve } from 'path'
+import { getMongoDbConfig } from './../config/mongo.config'
 
 import { UserModel } from './user/user.model'
 
 @Module({
   imports: [
+    ConfigModule.forRoot({
+      envFilePath: `${process.cwd()}/.env.${process.env.NODE_ENV}`,
+    }),
+
     ServeStaticModule.forRoot({
-      rootPath: resolve('../../app-next/client/out'),
+      rootPath: resolve('../../../app/app-next/client/out'), //нужно для докера  выйти до app
       exclude: ['/api*'],
     }),
-    ConfigModule.forRoot(),
     TypegooseModule.forRootAsync({
       imports: [ConfigModule],
       inject: [ConfigService],

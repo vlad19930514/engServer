@@ -55,6 +55,7 @@ export class AuthController {
   @UseGuards(AuthGuard('google'))
   async googleAuthRedirect(@Req() req, @Res() res) {
     const data = await this.AuthService.googleLogin(req.user)
-    res.redirect('http://localhost:3000/auth/' + JSON.stringify(data))
+    const redirect = process.env.redirect
+    res.redirect(`${redirect}` + JSON.stringify(data))
   }
 }
