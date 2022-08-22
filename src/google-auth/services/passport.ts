@@ -39,6 +39,9 @@ export class GoogleAuthStrategy extends PassportStrategy(Strategy, 'google') {
         googleId: await hash(profile.id, salt),
         name: profile._json.name,
         email: profile._json.email,
+        given_name: profile._json.given_name,
+        family_name: profile._json.family_name,
+        picture: profile._json.picture,
         List: [
           {
             listName: 'Основной список',

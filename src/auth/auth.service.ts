@@ -127,6 +127,8 @@ export class AuthService {
   returnUserFields(user: UserModel) {
     return {
       _id: user._id,
+      given_name: user.given_name,
+      family_name: user.family_name,
       email: user.email,
       isAdmin: user.isAdmin,
       List: user.List,
